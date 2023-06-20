@@ -30,13 +30,4 @@ router.post('/auth/register', async (req, res) => {
   res.status(201).json({ success: true });
 });
 
-// 내 정보 조회 API
-router.get('/auth/me', authMiddleware, async (req, res) => {
-  const { email, nickname } = res.locals.user;
-
-  res.status(200).json({
-    user: { nickname, password },
-  });
-});
-
 module.exports = router;
