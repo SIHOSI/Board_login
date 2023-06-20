@@ -23,6 +23,10 @@ router.post('/posts/:postId/comments', authMiddleware, async (req, res) => {
       return res.status(400).json({ errorMessage: '존재하지 않는 게시글ID' });
     }
 
+    if (!commentcontent) {
+      return res.status(400).json({ errorMessage: '댓글을 입력해주세요.' });
+    }
+
     const comment = new Comment({
       nickname: post.nickname,
       nicknameId: post.nicknameId,
@@ -37,6 +41,18 @@ router.post('/posts/:postId/comments', authMiddleware, async (req, res) => {
       success: true,
       comment: comment,
     });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ errorMessage: '서버 에러' });
+  }
+});
+
+//댓글 조회 게시글기준
+router.get('/posts/:postId/comments', async (req, res) => {
+  const { postId } = req.params;
+  try {
+    const comments = await Comment.find({ postId }).sort({ syncTime: -1 });
+    res.status(200).json({ all_Comments: comments });
   } catch (error) {
     console.error(error);
     res.status(500).json({ errorMessage: '서버 에러' });
