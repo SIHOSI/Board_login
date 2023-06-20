@@ -103,4 +103,30 @@ router.patch('/posts/:postId', async (req, res) => {
   }
 });
 
+//게시글 삭제
+router.delete('/posts/:postId', async (req, res) => {
+  const { postId } = req.params;
+
+  try {
+    if (!mongoose.isValidObjectId(postId)) {
+      return res.status(400).json({ errorMessage: '유효하지 않은 게시글ID' });
+    }
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(400).json({ errorMessage: '존재하지 않는 게시글ID' });
+    }
+
+    console.log(post);
+
+    await Post.deleteOne(post);
+
+    res.status(201).json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ errorMessage: '서버 에러' });
+  }
+});
+
 module.exports = router;
