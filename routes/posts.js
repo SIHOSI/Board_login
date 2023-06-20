@@ -21,13 +21,13 @@ router.post('/posts', authMiddleware, async (req, res) => {
   // console.log(res.locals);
   const { user } = res.locals;
 
-  console.log(user);
+  // console.log(user);
 
   try {
     const post = new Post({
       title,
       content,
-      nicknameId: user.userId,
+      nicknameId: user._id,
       nickname: user.nickname,
     });
     console.log(post);
