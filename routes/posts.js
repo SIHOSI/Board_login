@@ -32,7 +32,10 @@ router.post('/posts', authMiddleware, async (req, res) => {
     });
     console.log(post);
     await post.save();
-    res.status(201).json({ success: true });
+    res.status(201).json({
+      success: true,
+      post: post,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ errorMessage: '서버 에러' });
@@ -40,7 +43,7 @@ router.post('/posts', authMiddleware, async (req, res) => {
 });
 
 //게시글 조회
-router.get('/posts/:postId', async (req, res) => {
+router.get('/posts/:postId', authMiddleware, async (req, res) => {
   const { postId } = req.params;
 
   try {
@@ -55,6 +58,45 @@ router.get('/posts/:postId', async (req, res) => {
     }
 
     res.status(200).json({ Post: post });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ errorMessage: '서버 에러' });
+  }
+});
+
+//게시글 수정
+router.patch('/posts/:postId', async (req, res) => {
+  const { postId } = req.params;
+  const { title, content } = req.body;
+
+  try {
+    if (!mongoose.isValidObjectId(postId)) {
+      return res.status(400).json({ errorMessage: '유효하지 않은 게시글ID' });
+    }
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(400).json({ errorMessage: '존재하지 않는 게시글ID' });
+    }
+
+    console.log(post);
+
+    if (title) {
+      post.title = title;
+      post.syncTime = Date.now();
+      await post.save();
+    }
+    if (content) {
+      post.content = content;
+      post.syncTime = Date.now();
+      await post.save();
+    }
+
+    res.status(201).json({
+      success: true,
+      post: post,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ errorMessage: '서버 에러' });
