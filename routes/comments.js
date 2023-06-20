@@ -119,4 +119,47 @@ router.patch(
   }
 );
 
+//댓글 삭제
+router.delete(
+  '/posts/:postId/comments/:commentId',
+  authMiddleware,
+  async (req, res) => {
+    const { postId, commentId } = req.params;
+    const { commentcontent } = req.body;
+    const { user } = res.locals;
+
+    try {
+      if (!mongoose.isValidObjectId(postId)) {
+        return res.status(400).json({ errorMessage: '유효하지 않은 게시글ID' });
+      }
+
+      const post = await Post.findById(postId);
+
+      if (!post) {
+        return res.status(400).json({ errorMessage: '존재하지 않는 게시글ID' });
+      }
+
+      if (!mongoose.isValidObjectId(commentId)) {
+        return res.status(400).json({ errorMessage: '유효하지 않은 댓글ID' });
+      }
+
+      const comment = await Comment.findById(commentId);
+
+      if (!comment) {
+        return res.status(400).json({ errorMessage: '존재하지 않는 댓글ID' });
+      }
+
+      if (!commentcontent) {
+        return res.status(400).json({ errorMessage: '댓글을 입력해주세요.' });
+      } else {
+        await Comment.deleteOne(comment);
+      }
+
+      res.status(201).json({ success: true });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ errorMessage: '서버 에러' });
+    }
+  }
+);
 module.exports = router;
