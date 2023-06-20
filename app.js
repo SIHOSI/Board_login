@@ -18,7 +18,10 @@ app.get('/register', (req, res) => {
   const filePath = path.join(__dirname, 'assets', 'register.html');
   res.sendFile(filePath);
 });
-
+app.get('/board', (req, res) => {
+  const filePath = path.join(__dirname, 'assets', 'board.html');
+  res.sendFile(filePath);
+});
 app.use('/api', [usersRouter, authRouter]);
 
 app.listen(port, () => {
