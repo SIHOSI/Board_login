@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const authMiddleware = require('../middlewares/auth-middleware');
 const Post = require('../schemas/post');
@@ -38,19 +39,26 @@ router.post('/posts', authMiddleware, async (req, res) => {
   }
 });
 
-module.exports = router;
+//게시글 조회
+router.get('/posts/:postId', async (req, res) => {
+  const { postId } = req.params;
 
-// {
-//   user: {
-//     _id: new ObjectId("64910a7801ab42f20cdbc9ec"),
-//     nickname: '1111',
-//     password: '2222',
-//     __v: 0
-//   }
-// }
-// {
-//   title: '2222',
-//   content: '2222',
-//   _id: new ObjectId("64914f05b344d43eac8cb7cd"),
-//   syncTime: 2023-06-20T07:02:29.441Z
-// }
+  try {
+    if (!mongoose.isValidObjectId(postId)) {
+      return res.status(400).json({ errorMessage: '유효하지 않은 게시글ID' });
+    }
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(400).json({ errorMessage: '존재하지 않는 게시글ID' });
+    }
+
+    res.status(200).json({ Post: post });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ errorMessage: '서버 에러' });
+  }
+});
+
+module.exports = router;
