@@ -125,7 +125,6 @@ router.delete(
   authMiddleware,
   async (req, res) => {
     const { postId, commentId } = req.params;
-    const { commentcontent } = req.body;
     const { user } = res.locals;
 
     try {
@@ -149,11 +148,7 @@ router.delete(
         return res.status(400).json({ errorMessage: '존재하지 않는 댓글ID' });
       }
 
-      if (!commentcontent) {
-        return res.status(400).json({ errorMessage: '댓글을 입력해주세요.' });
-      } else {
-        await Comment.deleteOne(comment);
-      }
+      await Comment.deleteOne(comment);
 
       res.status(201).json({ success: true });
     } catch (error) {
